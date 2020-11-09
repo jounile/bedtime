@@ -6,32 +6,41 @@ from PyQt5 import QtWidgets
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QFont
-from PyQt5.QtWidgets import QApplication, QLabel
+from PyQt5.QtWidgets import QMainWindow, QApplication, QLabel
 
 class MyMainWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
 
-        self.count = 10
+        self.count = 60
 
         central_widget = QtWidgets.QWidget()
         self.setCentralWidget(central_widget)
         vbox = QtWidgets.QVBoxLayout()
+        vbox.setAlignment(Qt.AlignCenter)
         central_widget.setLayout(vbox)
 
-        self.label = QtWidgets.QLabel("Countdown")
+        self.label = QtWidgets.QLabel("Bedtime")
         vbox.addWidget(self.label)
 
         self.time_passed_qll = QtWidgets.QLabel()
+        self.time_passed_qll.setAlignment(Qt.AlignCenter)
         vbox.addWidget(self.time_passed_qll)       
 
         self.setWindowOpacity(0.1)
-        self.setAttribute(Qt.WA_TranslucentBackground)
-        self.setAttribute(Qt.WA_NoSystemBackground, True)
-        self.setWindowFlags(Qt.FramelessWindowHint)
-        self.setFont(QFont("Times", 100, QFont.Bold))
-        self.adjustSize()
-        self.move(QApplication.instance().desktop().screen().rect().center() - self.rect().center())
+        self.setWindowFlags(
+            QtCore.Qt.WindowStaysOnTopHint |
+            QtCore.Qt.FramelessWindowHint |
+            QtCore.Qt.X11BypassWindowManagerHint
+        )
+        self.setGeometry(
+            QtWidgets.QStyle.alignedRect(
+                QtCore.Qt.LeftToRight, QtCore.Qt.AlignCenter,
+                QtCore.QSize(420, 32),
+                QtWidgets.qApp.desktop().availableGeometry()
+        ))
+
+        self.setFont(QFont("Times", 200, QFont.Bold))
 
         self.timer_start()
         self.update_gui()
@@ -56,11 +65,12 @@ class MyMainWindow(QtWidgets.QMainWindow):
         self.time_passed_qll.setText(text)
 
     def close_application(self):
-        sys.exit(app.exec_())
+        QtWidgets.qApp.quit()
 
-app = QtWidgets.QApplication(sys.argv)
+if __name__ == '__main__':
+    app = QtWidgets.QApplication(sys.argv)
 
-main_window = MyMainWindow()
-main_window.showFullScreen()
+    main_window = MyMainWindow()
+    main_window.showFullScreen()
 
-sys.exit(app.exec_())
+    sys.exit(app.exec_())
