@@ -12,7 +12,15 @@ class MyMainWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
 
-        self.count = 10
+        self.count = 4815
+
+        self.intervals = (
+            ('w', 604800),  # 60 * 60 * 24 * 7
+            ('d', 86400),    # 60 * 60 * 24
+            ('h', 3600),    # 60 * 60
+            ('min', 60),
+            ('seconds', 1),
+        )
 
         central_widget = QtWidgets.QWidget()
         self.setCentralWidget(central_widget)
@@ -60,8 +68,20 @@ class MyMainWindow(QtWidgets.QMainWindow):
 
     def update_gui(self):
         self.count = self.count - 1
-        text = str(self.count) + " s"
+        text = str(self.display_time(self.count, 4))
         self.time_passed.setText(text)
+
+    def display_time(self, seconds, granularity=2):
+        result = []
+
+        for name, count in self.intervals:
+            value = seconds // count
+            if value:
+                seconds -= value * count
+                if value == 1:
+                    name = name.rstrip('s')
+                result.append("{} {}".format(value, name))
+        return '\n'.join(result[:granularity])
 
     def close_application(self):
         QtWidgets.qApp.quit()
